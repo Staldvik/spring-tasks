@@ -1,7 +1,12 @@
 package dev.staldvik.tasks.service;
 
 import dev.staldvik.tasks.domain.task.Task;
+import dev.staldvik.tasks.domain.task.exception.TaskNotFoundException;
+import dev.staldvik.tasks.dto.task.CreateTaskDto;
+import dev.staldvik.tasks.dto.task.TaskDto;
+import dev.staldvik.tasks.dto.task.UpdateTaskDto;
 import dev.staldvik.tasks.infrastructure.repository.TaskRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,23 +21,38 @@ public class TaskService {
         this.repo = repo;
     }
 
-    public Task createTask(Task task) {
-        return repo.save(task);
+    public TaskDto createTask(CreateTaskDto createTaskDto) {
+        var task = TaskMapper.toEntity(createTaskDto);
+        var savedTask = repo.save(task);
+        return TaskMapper.toDto(savedTask);
     }
 
-    public List<Task> getAllTasks() {
-        ArrayList<Task> tasks = new ArrayList<>();
-        repo.findAll().iterator().forEachRemaining(tasks::add);
+    // TODO: There has to be a better way to get all? Surely something built in handles all of the pagination and stuff as well
+    public List<TaskDto> getAllTasks() {
+        ArrayList<TaskDto> tasks = new ArrayList<>();
+        repo.findAll().iterator().forEachRemaining(t -> tasks.add(TaskMapper.toDto(t)));
         return tasks;
     }
 
-    public Task getById(long id) {
-        return repo.findById(id).orElseThrow(() -> new RuntimeException("Task not found")); // TODO: TaskNotFoundException
+    public TaskDto getById(long id) {
+        var task = repo.findById(id).orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " was not found"));
+        return TaskMapper.toDto(task);
     }
 
-    public Task updateTask(Task task) {
-        Task taskToUpdate = repo.findById(task.getId()).orElseThrow(() -> new RuntimeException("Task not found"));
-        repo.save(task);
-        return taskToUpdate;
+    @Transactional
+    public TaskDto updateTask(long id, UpdateTaskDto updateTaskDto) {
+        Task taskToUpdate = repo.findById(id).orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " was not found"));
+
+        // TODO: This mutates, I generally don't like that, but maybe OK in this land?
+        TaskMapper.updateTaskFromDto(taskToUpdate, updateTaskDto);
+
+        var savedTask = repo.save(taskToUpdate);
+
+        return TaskMapper.toDto(savedTask);
+    }
+
+    public void deleteTask(long id) {
+        repo.findById(id).orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " was not found"));
+        repo.deleteById(id);
     }
 }

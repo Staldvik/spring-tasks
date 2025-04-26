@@ -19,16 +19,19 @@ public class Task {
     protected Task() {}
 
     public Task(String title) {
-        this.title = title;
-        this.completed = false;
+        this(title, false);
     }
 
-    public void markAsCompleted() {
-        if (this.completed) {
-            throw new IllegalStateException("Task is already completed");
-        }
+    public Task(String title, Boolean completed) {
+        this.title = title;
+        this.completed = completed;
+    }
 
-        this.completed = true;
+    public void updateCompleted(boolean completed) {
+        if (this.completed == completed) {
+            throw new IllegalStateException("Task is already in that state");
+        }
+        this.completed = completed;
     }
 
     public void updateTitle(String newTitle) {
