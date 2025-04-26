@@ -4,7 +4,6 @@ import dev.staldvik.tasks.dto.task.CreateTaskDto;
 import dev.staldvik.tasks.dto.task.TaskDto;
 import dev.staldvik.tasks.dto.task.UpdateTaskDto;
 import dev.staldvik.tasks.service.TaskService;
-import dev.staldvik.tasks.domain.task.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
