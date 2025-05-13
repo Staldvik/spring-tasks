@@ -5,6 +5,8 @@ import dev.staldvik.tasks.dto.task.TaskDto;
 import dev.staldvik.tasks.dto.task.UpdateTaskDto;
 import dev.staldvik.tasks.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
 @Slf4j
 @RestController
 public class TaskController {
+    private static final Logger log = LoggerFactory.getLogger(TaskController.class);
     private final TaskService taskService;
 
     TaskController(TaskService taskService) {
